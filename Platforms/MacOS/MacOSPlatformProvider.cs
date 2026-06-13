@@ -25,30 +25,25 @@ internal sealed class MacOSPlatformProvider : IPlatformProvider
       if (mainScreen == nint.Zero)
         return SafeAreaRect.Empty;
 
+      var frameSel = AppKit.SelRegisterName("frame");
       var visibleFrameSel = AppKit.SelRegisterName("visibleFrame");
 
-      NSRect frame;
+      NSRect mainFrame = GetRect(mainScreen, frameSel);
+      nint targetScreen = FindScreenContainingPoint(
+        nsScreenClass,
+        windowX,
+        windowY,
+        mainFrame,
+        frameSel
+      );
 
-      // On ARM64 macOS, stret is not used for small structs — objc_msgSend returns directly.
-      // On x86_64, NSRect (32 bytes) requires objc_msgSend_stret.
-      if (RuntimeInformation.ProcessArchitecture is Architecture.Arm64)
-      {
-        // ARM64: objc_msgSend returns the struct in registers
-        // We need a different interop signature for this case.
-        // For simplicity, use objc_msgSend_stret which works on both architectures in .NET
-        AppKit.ObjcMsgSendStret(out frame, mainScreen, visibleFrameSel);
-      }
-      else
-      {
-        AppKit.ObjcMsgSendStret(out frame, mainScreen, visibleFrameSel);
-      }
+      if (targetScreen == nint.Zero)
+        targetScreen = mainScreen;
 
-      // macOS uses bottom-left origin; convert to top-left for consistency.
-      // We need the full screen height to flip.
-      var frameSel = AppKit.SelRegisterName("frame");
-      AppKit.ObjcMsgSendStret(out NSRect fullFrame, mainScreen, frameSel);
+      NSRect frame = GetRect(targetScreen, visibleFrameSel);
 
-      int flippedY = (int)(fullFrame.Height - frame.Y - frame.Height);
+      // macOS uses bottom-left origin; Godot window coordinates are top-left.
+      int flippedY = (int)(mainFrame.Height - frame.Y - frame.Height);
 
       return new SafeAreaRect(
         (int)frame.X,
@@ -61,5 +56,57 @@ internal sealed class MacOSPlatformProvider : IPlatformProvider
     {
       return SafeAreaRect.Empty;
     }
+  }
+
+  private static nint FindScreenContainingPoint(
+    nint nsScreenClass,
+    int windowX,
+    int windowY,
+    NSRect mainFrame,
+    nint frameSel
+  )
+  {
+    var screensSel = AppKit.SelRegisterName("screens");
+    var screens = AppKit.ObjcMsgSend(nsScreenClass, screensSel);
+    if (screens == nint.Zero)
+      return nint.Zero;
+
+    var countSel = AppKit.SelRegisterName("count");
+    UIntPtr count = AppKit.ObjcMsgSendNUInt(screens, countSel);
+    if (count == UIntPtr.Zero)
+      return nint.Zero;
+
+    var objectAtIndexSel = AppKit.SelRegisterName("objectAtIndex:");
+    for (nuint i = 0; i < (nuint)count; i++)
+    {
+      nint screen = AppKit.ObjcMsgSend(screens, objectAtIndexSel, (UIntPtr)i);
+      if (screen == nint.Zero)
+        continue;
+
+      NSRect frame = GetRect(screen, frameSel);
+      if (ContainsTopLeftPoint(frame, windowX, windowY, mainFrame.Height))
+        return screen;
+    }
+
+    return nint.Zero;
+  }
+
+  private static NSRect GetRect(nint receiver, nint selector)
+  {
+    if (RuntimeInformation.ProcessArchitecture is Architecture.Arm64)
+      return AppKit.ObjcMsgSendNSRect(receiver, selector);
+
+    AppKit.ObjcMsgSendStret(out NSRect rect, receiver, selector);
+    return rect;
+  }
+
+  private static bool ContainsTopLeftPoint(NSRect frame, int x, int y, double mainScreenHeight)
+  {
+    double left = frame.X;
+    double top = mainScreenHeight - frame.Y - frame.Height;
+    double right = left + frame.Width;
+    double bottom = top + frame.Height;
+
+    return x >= left && x < right && y >= top && y < bottom;
   }
 }

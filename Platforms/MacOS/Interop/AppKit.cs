@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.InteropServices;
 
 namespace Winithm.Native.Platforms.MacOS.Interop;
@@ -21,6 +22,15 @@ internal static partial class AppKit
 
   [LibraryImport("/usr/lib/libobjc.A.dylib", EntryPoint = "objc_msgSend")]
   internal static partial nint ObjcMsgSend(nint receiver, nint selector);
+
+  [LibraryImport("/usr/lib/libobjc.A.dylib", EntryPoint = "objc_msgSend")]
+  internal static partial nint ObjcMsgSend(nint receiver, nint selector, UIntPtr arg1);
+
+  [LibraryImport("/usr/lib/libobjc.A.dylib", EntryPoint = "objc_msgSend")]
+  internal static partial UIntPtr ObjcMsgSendNUInt(nint receiver, nint selector);
+
+  [LibraryImport("/usr/lib/libobjc.A.dylib", EntryPoint = "objc_msgSend")]
+  internal static partial NSRect ObjcMsgSendNSRect(nint receiver, nint selector);
 
   [LibraryImport("/usr/lib/libobjc.A.dylib", EntryPoint = "objc_msgSend_stret")]
   internal static partial void ObjcMsgSendStret(out NSRect result, nint receiver, nint selector);
