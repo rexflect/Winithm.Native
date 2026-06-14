@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.InteropServices;
 using Winithm.Native.Platforms.MacOS.Interop;
 
