@@ -16,7 +16,7 @@ internal static partial class User32
   [LibraryImport("user32.dll")]
   internal static partial nint MonitorFromPoint(POINT pt, uint dwFlags);
 
-  [LibraryImport("user32.dll", StringMarshalling = StringMarshalling.Utf16)]
+  [LibraryImport("user32.dll", EntryPoint = "GetMonitorInfoW", StringMarshalling = StringMarshalling.Utf16)]
   [return: MarshalAs(UnmanagedType.Bool)]
   internal static partial bool GetMonitorInfo(nint hMonitor, ref MONITORINFO lpmi);
 }
