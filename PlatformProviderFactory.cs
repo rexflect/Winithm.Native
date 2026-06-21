@@ -11,6 +11,7 @@ public static class PlatformProviderFactory
   {
     _ when RuntimeInformation.IsOSPlatform(OSPlatform.Windows) => new Platforms.Windows.WindowsPlatformProvider(),
     _ when RuntimeInformation.IsOSPlatform(OSPlatform.OSX)     => new Platforms.MacOS.MacOSPlatformProvider(),
+    _ when RuntimeInformation.IsOSPlatform(OSPlatform.Linux)   => new Platforms.Linux.LinuxPlatformProvider(),
     _                                                           => new NullPlatformProvider(),
   };
 }
