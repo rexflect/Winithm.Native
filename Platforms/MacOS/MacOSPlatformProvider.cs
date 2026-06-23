@@ -110,4 +110,42 @@ internal sealed class MacOSPlatformProvider : IPlatformProvider
 
     return x >= left && x < right && y >= top && y < bottom;
   }
+
+  public Godot.Color? GetAccentColor()
+  {
+    try
+    {
+      var nsColorClass = AppKit.ObjcGetClass("NSColor");
+      if (nsColorClass == nint.Zero) return null;
+
+      var controlAccentColorSel = AppKit.SelRegisterName("controlAccentColor");
+      var accentColor = AppKit.ObjcMsgSend(nsColorClass, controlAccentColorSel);
+      if (accentColor == nint.Zero) return null;
+
+      var nsColorSpaceClass = AppKit.ObjcGetClass("NSColorSpace");
+      if (nsColorSpaceClass == nint.Zero) return null;
+
+      var sRGBColorSpaceSel = AppKit.SelRegisterName("sRGBColorSpace");
+      var sRGBSpace = AppKit.ObjcMsgSend(nsColorSpaceClass, sRGBColorSpaceSel);
+      if (sRGBSpace == nint.Zero) return null;
+
+      var colorUsingColorSpaceSel = AppKit.SelRegisterName("colorUsingColorSpace:");
+      var rgbColor = AppKit.ObjcMsgSend(accentColor, colorUsingColorSpaceSel, (UIntPtr)sRGBSpace);
+      if (rgbColor == nint.Zero) return null;
+
+      var redComponentSel = AppKit.SelRegisterName("redComponent");
+      var greenComponentSel = AppKit.SelRegisterName("greenComponent");
+      var blueComponentSel = AppKit.SelRegisterName("blueComponent");
+
+      double r = AppKit.ObjcMsgSendDouble(rgbColor, redComponentSel);
+      double g = AppKit.ObjcMsgSendDouble(rgbColor, greenComponentSel);
+      double b = AppKit.ObjcMsgSendDouble(rgbColor, blueComponentSel);
+
+      return new Godot.Color((float)r, (float)g, (float)b, 1f);
+    }
+    catch
+    {
+      return null;
+    }
+  }
 }

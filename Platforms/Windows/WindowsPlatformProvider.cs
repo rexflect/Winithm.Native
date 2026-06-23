@@ -32,4 +32,20 @@ internal sealed class WindowsPlatformProvider : IPlatformProvider
       mi.RcWork.Bottom - mi.RcWork.Top
     );
   }
+
+  public Godot.Color? GetAccentColor()
+  {
+    if (Dwmapi.DwmGetColorizationColor(out uint color, out _) == 0) // S_OK
+    {
+      // Format is AARRGGBB
+      float a = ((color >> 24) & 0xFF) / 255f;
+      float r = ((color >> 16) & 0xFF) / 255f;
+      float g = ((color >> 8) & 0xFF) / 255f;
+      float b = (color & 0xFF) / 255f;
+
+      // We ignore alpha to just return the base accent color.
+      return new Godot.Color(r, g, b, a);
+    }
+    return null;
+  }
 }

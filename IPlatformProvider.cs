@@ -28,4 +28,9 @@ public interface IPlatformProvider
   // nint DeferWindowPos(nint hdwp, nint hwnd, nint hwndInsertAfter,
   //                     int x, int y, int cx, int cy, uint flags);
   // bool EndDeferWindowPos(nint hdwp);
+
+  /// <summary>
+  /// Returns the OS accent color, or null if unavailable.
+  /// </summary>
+  Godot.Color? GetAccentColor();
 }

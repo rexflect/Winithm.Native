@@ -7,4 +7,6 @@ namespace Winithm.Native;
 internal sealed class NullPlatformProvider : IPlatformProvider
 {
   public SafeAreaRect GetWorkArea(int windowX, int windowY) => SafeAreaRect.Empty;
+
+  public Godot.Color? GetAccentColor() => null;
 }

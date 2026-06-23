@@ -124,4 +124,6 @@ internal sealed class LinuxPlatformProvider : IPlatformProvider
     result = (int)value;
     return true;
   }
+
+  public Godot.Color? GetAccentColor() => null;
 }

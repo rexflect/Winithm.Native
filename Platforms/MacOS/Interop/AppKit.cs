@@ -34,6 +34,9 @@ internal static partial class AppKit
 
   [LibraryImport("/usr/lib/libobjc.A.dylib", EntryPoint = "objc_msgSend_stret")]
   internal static partial void ObjcMsgSendStret(out NSRect result, nint receiver, nint selector);
+
+  [DllImport("/usr/lib/libobjc.A.dylib", EntryPoint = "objc_msgSend")]
+  internal static extern double ObjcMsgSendDouble(nint receiver, nint selector);
 }
 
 /// <summary>
