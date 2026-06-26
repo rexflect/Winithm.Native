@@ -148,4 +148,9 @@ internal sealed class MacOSPlatformProvider : IPlatformProvider
       return null;
     }
   }
+
+  public void SetClickThrough(nint hwnd, bool passthrough) 
+  { 
+    // Fallback handled by WindowDesktopManager Godot layer
+  }
 }

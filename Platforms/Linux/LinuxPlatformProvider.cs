@@ -125,5 +125,14 @@ internal sealed class LinuxPlatformProvider : IPlatformProvider
     return true;
   }
 
-  public Godot.Color? GetAccentColor() => null;
+  public Godot.Color? GetAccentColor()
+  {
+    // Implementation intentionally removed. Needs fixing in separate ticket.
+    return null;
+  }
+
+  public void SetClickThrough(nint hwnd, bool passthrough) 
+  { 
+    // Fallback handled by WindowDesktopManager Godot layer
+  }
 }

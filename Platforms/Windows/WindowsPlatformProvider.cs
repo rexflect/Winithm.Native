@@ -48,4 +48,28 @@ internal sealed class WindowsPlatformProvider : IPlatformProvider
     }
     return null;
   }
+
+  private const int GWL_EXSTYLE = -20;
+  private const int WS_EX_TRANSPARENT = 0x00000020;
+  private const int WS_EX_LAYERED = 0x00080000;
+  
+  private const uint SWP_NOMOVE = 0x0002;
+  private const uint SWP_NOSIZE = 0x0001;
+  private const uint SWP_NOZORDER = 0x0004;
+  private const uint SWP_FRAMECHANGED = 0x0020;
+
+  public void SetClickThrough(nint hwnd, bool passthrough)
+  {
+    if (hwnd == 0) return;
+
+    int exStyle = User32.GetWindowLong(hwnd, GWL_EXSTYLE);
+    if (passthrough)
+      exStyle |= WS_EX_TRANSPARENT | WS_EX_LAYERED;
+    else
+      exStyle &= ~WS_EX_TRANSPARENT; // Do not remove WS_EX_LAYERED to preserve transparency.
+
+    User32.SetWindowLong(hwnd, GWL_EXSTYLE, exStyle);
+    // Force Windows to apply the updated exStyle
+    User32.SetWindowPos(hwnd, 0, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+  }
 }

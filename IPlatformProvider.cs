@@ -33,4 +33,9 @@ public interface IPlatformProvider
   /// Returns the OS accent color, or null if unavailable.
   /// </summary>
   Godot.Color? GetAccentColor();
+
+  /// <summary>
+  /// Toggles OS-level click-through for the specified window handle.
+  /// </summary>
+  void SetClickThrough(nint hwnd, bool passthrough);
 }

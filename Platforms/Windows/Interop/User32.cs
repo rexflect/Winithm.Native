@@ -19,6 +19,15 @@ internal static partial class User32
   [LibraryImport("user32.dll", EntryPoint = "GetMonitorInfoW", StringMarshalling = StringMarshalling.Utf16)]
   [return: MarshalAs(UnmanagedType.Bool)]
   internal static partial bool GetMonitorInfo(nint hMonitor, ref MONITORINFO lpmi);
+  [LibraryImport("user32.dll", EntryPoint = "GetWindowLongW")]
+  internal static partial int GetWindowLong(nint hWnd, int nIndex);
+
+  [LibraryImport("user32.dll", EntryPoint = "SetWindowLongW")]
+  internal static partial int SetWindowLong(nint hWnd, int nIndex, int dwNewLong);
+
+  [LibraryImport("user32.dll", SetLastError = false)]
+  [return: MarshalAs(UnmanagedType.Bool)]
+  internal static partial bool SetWindowPos(nint hWnd, nint hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 }
 
 [StructLayout(LayoutKind.Sequential)]
